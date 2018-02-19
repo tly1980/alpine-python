@@ -18,9 +18,9 @@ ENV PACKAGES="\
 
 RUN echo \
   # replacing default repositories with edge ones
-  && echo "http://dl-cdn.alpinelinux.org/alpine/3.7/testing" > /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/3.7/community" >> /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/3.7/main" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/testing" > /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/community" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/main" >> /etc/apk/repositories \
 
   # Add the packages, with a CDN-breakage fallback if needed
   && apk add --no-cache $PACKAGES || \
