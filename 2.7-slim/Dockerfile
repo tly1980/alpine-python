@@ -9,11 +9,13 @@ ENV ALPINE_VERSION=3.7
 #   * python: the binaries themselves
 #   * py-setuptools: required only in major version 2, installs easy_install so we can install Pip.
 ENV PACKAGES="\
-  dumb-init \
   bash \
   ca-certificates \
   python2 \
   py-setuptools \
+  build-base \
+  linux-headers \
+  python2-dev \
 "
 
 RUN echo \
@@ -24,9 +26,7 @@ RUN echo \
   # && echo "@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
   # && echo "@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
   # && echo "@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
-  && apk add --no-cache build-base &&
-  && apk add --no-cache linux-headers &&
-  && apk add --no-cache python2-dev &&
+  && apk add $PACKAGES \
   # make some useful symlinks that are expected to exist
   && if [[ ! -e /usr/bin/python ]];        then ln -sf /usr/bin/python2.7 /usr/bin/python; fi \
   && if [[ ! -e /usr/bin/python-config ]]; then ln -sf /usr/bin/python2.7-config /usr/bin/python-config; fi \
