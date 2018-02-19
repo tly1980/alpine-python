@@ -21,17 +21,12 @@ RUN echo \
   && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/testing" > /etc/apk/repositories \
   && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/community" >> /etc/apk/repositories \
   && echo "http://dl-cdn.alpinelinux.org/alpine/v3.7/main" >> /etc/apk/repositories \
-
-  # Add the packages, with a CDN-breakage fallback if needed
-  && apk add --no-cache $PACKAGES || \
-    (sed -i -e 's/dl-cdn/dl-4/g' /etc/apk/repositories && apk add --no-cache $PACKAGES) \
-
-  # turn back the clock -- so hacky!
-  && echo "http://dl-cdn.alpinelinux.org/alpine/v$ALPINE_VERSION/main/" > /etc/apk/repositories \
   # && echo "@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
   # && echo "@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
   # && echo "@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
-
+  && apk add --no-cache build-base &&
+  && apk add --no-cache linux-headers &&
+  && apk add --no-cache python2-dev &&
   # make some useful symlinks that are expected to exist
   && if [[ ! -e /usr/bin/python ]];        then ln -sf /usr/bin/python2.7 /usr/bin/python; fi \
   && if [[ ! -e /usr/bin/python-config ]]; then ln -sf /usr/bin/python2.7-config /usr/bin/python-config; fi \
@@ -41,25 +36,4 @@ RUN echo \
   && easy_install pip \
   && pip install --upgrade pip \
   && if [[ ! -e /usr/bin/pip ]]; then ln -sf /usr/bin/pip2.7 /usr/bin/pip; fi \
-  && echo
-
-# Copy in the entrypoint script -- this installs prerequisites on container start.
-COPY entrypoint.sh /entrypoint.sh
-
-# These packages are not installed immediately, but are added at runtime or ONBUILD to shrink the image as much as possible. Notes:
-#   * build-base: used so we include the basic development packages (gcc)
-#   * linux-headers: commonly needed, and an unusual package name from Alpine.
-#   * python-dev: are used for gevent e.g.
-#   * py-pip: provides pip, not needed once the software is built
-ENV BUILD_PACKAGES="\
-  build-base \
-  linux-headers \
-  python2-dev \
-"
-
-# This script installs APK and Pip prerequisites on container start, or ONBUILD. Notes:
-#   * Reads the -a flags and /apk-requirements.txt for install requests
-#   * Reads the -b flags and /build-requirements.txt for build packages -- removed when build is complete
-#   * Reads the -p flags and /requirements.txt for Pip packages
-#   * Reads the -r flag to specify a different file path for /requirements.txt
-ENTRYPOINT ["/usr/bin/dumb-init", "bash", "/entrypoint.sh"]
+  && echo "Finished the base"
